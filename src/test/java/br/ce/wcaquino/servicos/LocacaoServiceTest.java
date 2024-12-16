@@ -5,6 +5,7 @@ import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
+import br.ce.wcaquino.exceptions.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -58,35 +59,36 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testeLocacao_filmeSemEstoque_2()  {
+    public void testeLocacao_usuarioVazio() throws FilmeSemEstoqueException {
         //cenario
-        LocacaoService service = new LocacaoService();
-        Usuario usuario = new Usuario("Usuario 1");
-        Filme filme = new Filme ("Filme 1", 0, 5.0);
+        LocacaoService service =new LocacaoService();
+        Filme filme = new Filme("Filme 2", 1, 4.0);
 
         //acao
         try {
-            service.alugarFilme(usuario, filme);
-            Assert.fail("Deveria ter lancado uma excecao");
-
-        } catch (Exception e) {
-            Assert.assertThat(e.getMessage(), is("Filme sem estoque"));
+            service.alugarFilme(null, filme);
+            Assert.fail();
+        } catch (LocadoraException e) {
+            assertThat(e.getMessage(), is("Usuario vazio"));
         }
+
+        System.out.println("Forma robusta");
     }
 
     @Test
-    public void testeLocacao_filmeSemEstoque_3() throws Exception {
+    public void testLocacao_FilmeVazio() throws FilmeSemEstoqueException, LocadoraException {
         //cenario
         LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Usuario 1");
-        Filme filme = new Filme ("Filme 1", 0, 5.0);
 
-        exception.expect(Exception.class);
-        exception.expectMessage("Filme sem estoque");
+
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("Filme vazio");
 
         //acao
-        service.alugarFilme(usuario, filme);
+        service.alugarFilme(usuario, null);
 
-
+        System.out.println("Forma nova");
     }
+
 }
