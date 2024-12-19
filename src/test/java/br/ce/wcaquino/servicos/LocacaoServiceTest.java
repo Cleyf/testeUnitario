@@ -12,7 +12,9 @@ import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static br.ce.wcaquino.utils.DataUtils.isMesmaData;
 import static br.ce.wcaquino.utils.DataUtils.obterDataComDiferencaDias;
@@ -40,13 +42,13 @@ public class LocacaoServiceTest {
     public void testeLocacao() throws Exception {
         //cenario
         Usuario usuario = new Usuario("Usuario 1");
-        Filme filme = new Filme ("Filme 1", 2, 5.0);
+        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 1, 5.0));
 
         System.out.println("Teste!");
 
         //acao
         Locacao locacao = null;
-        locacao = service.alugarFilme(usuario, filme);
+        locacao = service.alugarFilme(usuario, filmes);
             //verificacao
         error.checkThat(locacao.getValor(), is(equalTo(5.0)));
         error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
@@ -59,21 +61,21 @@ public class LocacaoServiceTest {
         //cenario
 
         Usuario usuario = new Usuario("Usuario 1");
-        Filme filme = new Filme ("Filme 1", 0, 5.0);
+        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 0, 4.0));
 
         //acao
-        service.alugarFilme(usuario, filme);
+        service.alugarFilme(usuario, filmes);
     }
 
     @Test
     public void testeLocacao_usuarioVazio() throws FilmeSemEstoqueException {
         //cenario
         LocacaoService service =new LocacaoService();
-        Filme filme = new Filme("Filme 2", 1, 4.0);
+        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 1, 5.0));
 
         //acao
         try {
-            service.alugarFilme(null, filme);
+            service.alugarFilme(null, filmes);
             Assert.fail();
         } catch (LocadoraException e) {
             assertThat(e.getMessage(), is("Usuario vazio"));
