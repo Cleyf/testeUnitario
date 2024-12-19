@@ -8,9 +8,7 @@ import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
 import br.ce.wcaquino.exceptions.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
 import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
@@ -25,17 +23,26 @@ import static org.hamcrest.core.IsNot.not;
 
 public class LocacaoServiceTest {
 
+    private LocacaoService service;
+
     @Rule
     public ErrorCollector error = new ErrorCollector();
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
+
+    @Before
+    public void setup(){
+        service = new LocacaoService();
+    }
+
     @Test
     public void testeLocacao() throws Exception {
         //cenario
-        LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Usuario 1");
         Filme filme = new Filme ("Filme 1", 2, 5.0);
+
+        System.out.println("Teste!");
 
         //acao
         Locacao locacao = null;
@@ -50,7 +57,7 @@ public class LocacaoServiceTest {
     @Test(expected = FilmeSemEstoqueException.class)
     public void testeLocacao_filmeSemEstoque() throws Exception {
         //cenario
-        LocacaoService service = new LocacaoService();
+
         Usuario usuario = new Usuario("Usuario 1");
         Filme filme = new Filme ("Filme 1", 0, 5.0);
 
@@ -71,14 +78,11 @@ public class LocacaoServiceTest {
         } catch (LocadoraException e) {
             assertThat(e.getMessage(), is("Usuario vazio"));
         }
-
-        System.out.println("Forma robusta");
     }
 
     @Test
     public void testLocacao_FilmeVazio() throws FilmeSemEstoqueException, LocadoraException {
         //cenario
-        LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Usuario 1");
 
 
@@ -87,8 +91,6 @@ public class LocacaoServiceTest {
 
         //acao
         service.alugarFilme(usuario, null);
-
-        System.out.println("Forma nova");
     }
 
 }
