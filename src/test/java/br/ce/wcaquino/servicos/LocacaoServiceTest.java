@@ -34,8 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class LocacaoServiceTest {
 
@@ -149,7 +148,7 @@ public class LocacaoServiceTest {
 
         List<Filme> filmes = Arrays.asList(umFilme().agora());
 
-        when(spc.possuiNegativacao(usuario)).thenReturn(true);
+        when(spc.possuiNegativacao(Mockito.any(Usuario.class))).thenReturn(true);
 
         //acao
         try {
@@ -166,16 +165,25 @@ public class LocacaoServiceTest {
     public void deveEnviarEmailParaLocacoesAtrasadas() {
         //cenario
         Usuario usuario = umUsuario().agora();
-
+        Usuario usuario2 = umUsuario().comNome("Usuario em dia").agora();
+        Usuario usuario3 = umUsuario().comNome("Outro atrasado").agora();
         List<Locacao> locacoes =
-                Arrays.asList(umLocacao().comUsuario(usuario).comDataRetorno(DataUtils.obterDataComDiferencaDias(-2)).agora());
+                Arrays.asList(
+                        umLocacao().atrasado().comUsuario(usuario).agora(),
+                        umLocacao().comUsuario(usuario2).agora(),
+                        umLocacao().atrasado().comUsuario(usuario3).agora(),
+                        umLocacao().atrasado().comUsuario(usuario3).agora());
         when(dao.obterLocacoesPendentes()).thenReturn(locacoes);
 
         //acao
         service.notificarAtrasos();
 
         //verificacao
+        verify(email, times(3)).notificarAtraso(Mockito.any(Usuario.class));
         verify(email).notificarAtraso(usuario);
+        verify(email, Mockito.atLeastOnce()).notificarAtraso(usuario3);
+        verify(email, never()).notificarAtraso(usuario2);
+        verifyNoMoreInteractions(email);
     }
 
 }
